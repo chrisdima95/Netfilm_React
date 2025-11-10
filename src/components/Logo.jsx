@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { interpolate } from 'flubber';
 
 // Path SVG per le due barre Pause
 const pauseBar1 = 'M200.12,500.46h24.27a0,0,0,0,1,0,0v79.07a0,0,0,0,1,0,0h-9.27a15,15,0,0,1-15-15V500.46A0,0,0,0,1,200.12,500.46Z'; // Prima barra (sinistra) - posizione Pause
-const pauseBar1Play = 'M183.31,500.46h24.27a0,0,0,0,1,0,0v79.07a0,0,0,0,1,0,0h-9.27a15,15,0,0,1-15-15V500.46A0,0,0,0,1,183.31,500.46Z'; // Prima barra (sinistra) - posizione Play (spostata a sinistra)
 const pauseBar2 = 'M236,500.46h24.27a0,0,0,0,1,0,0v79.07a0,0,0,0,1,0,0H251a15,15,0,0,1-15-15V500.46A0,0,0,0,1,236,500.46Z'; // Seconda barra (destra) - si trasforma
 
 // Path SVG per il triangolo Play (sostituisce la seconda barra)
@@ -15,7 +14,6 @@ const textOffsetPercent = (16.81 / 1080) * 100; // Circa 1.56% del viewBox
 
 export default function Logo({ size = 'normal', onAnimationComplete, animate = false }) {
   const svgRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const bar1Ref = useRef(null); // Prima barra (rimane ferma)
   const bar2Ref = useRef(null); // Seconda barra (si trasforma in triangolo)
   const textGroupRef = useRef(null); // Gruppo per il testo NETFILM
@@ -53,7 +51,8 @@ export default function Logo({ size = 'normal', onAnimationComplete, animate = f
       let interpolator;
       try {
         interpolator = interpolate(fromPath, toPath);
-      } catch (e) {
+      } catch (error) {
+        console.error('Animazione logo: impossibile interpolare i path', error);
         // Se flubber fallisce, usa cambio diretto
         element.setAttribute('d', toPath);
         if (onComplete) onComplete();
@@ -86,7 +85,6 @@ export default function Logo({ size = 'normal', onAnimationComplete, animate = f
     };
 
     const animateToPlay = () => {
-      setIsPlaying(true);
       hasAnimatedRef.current = true;
       
       // Sposta la prima barra a sinistra usando transform (come nell'SVG originale Play)

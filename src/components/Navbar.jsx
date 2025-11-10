@@ -3,7 +3,7 @@ import Sidebar from './Sidebar';
 import Logo from './Logo';
 import loginImg from '../assets/login.png';
 import './Navbar.css';
-import { useLoginModal } from '../context/LoginModalContext';
+import { useLoginModal } from '../context/useLoginModal';
 
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

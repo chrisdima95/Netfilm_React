@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import SplashScreen from './pages/SplashScreen';
-import HomeWrapper from './components/HomeWrapper';
+import Home from './pages/Home';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Layout from './components/Layout';
 import { LoginModalProvider } from './context/LoginModalContext';
@@ -16,7 +16,8 @@ export default function App() {
       <LoginModalProvider>
         <Routes>
           <Route path="/" element={<SplashScreen />} />
-          <Route path="/home" element={<HomeWrapper />}>
+          <Route path="/home" element={<Layout />}>
+            <Route index element={<Home />} />
             <Route
               path="film/:id"
               element={
@@ -27,43 +28,28 @@ export default function App() {
             />
             <Route
               path="todos"
-              element={<Layout />}
-            >
-              <Route
-                index
-                element={
-                  <ProtectedRoute>
-                    <ListaTodos />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
+              element={
+                <ProtectedRoute>
+                  <ListaTodos />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="profilo"
-              element={<Layout />}
-            >
-              <Route
-                index
-                element={
-                  <ProtectedRoute>
-                    <Profilo />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
+              element={
+                <ProtectedRoute>
+                  <Profilo />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="preferiti"
-              element={<Layout />}
-            >
-              <Route
-                index
-                element={
-                  <ProtectedRoute>
-                    <Preferiti />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
+              element={
+                <ProtectedRoute>
+                  <Preferiti />
+                </ProtectedRoute>
+              }
+            />
           </Route>
           <Route path="*" element={<h1 style={{ padding: 24, color: '#fff' }}>404 - Pagina non trovata</h1>} />
         </Routes>

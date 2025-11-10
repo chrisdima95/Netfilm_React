@@ -1,19 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTodos } from '../api/jsonplaceholder';
-import Navbar from '../components/Navbar';
-import { useLoginModal } from '../context/LoginModalContext';
+import { useLoginModal } from '../context/useLoginModal';
+import { HOME_POSTER_PAIRS, LEFT_POSTER_IDS } from '../constants/posters';
 import './Home.css';
-import img01 from '../assets/57 secondi.jpg';
-import img02 from '../assets/argo.jpg';
-import img03 from '../assets/dracula.jpg';
-import img04 from '../assets/gladiatore.jpg';
-import img05 from '../assets/inception.jpg';
-import img06 from '../assets/king conqueror.jpg';
-import img07 from '../assets/Oppenheimer.jpg';
-import img08 from '../assets/prophecy.jpg';
-import img09 from '../assets/Titanic.jpg';
-import img10 from '../assets/un delitto ideale.jpg';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -171,29 +161,23 @@ export default function Home() {
   }
 
   // Associa ogni immagine a un todo (10 immagini per 10 todos)
-  const images = [
-    { left: img01, right: img06 },
-    { left: img02, right: img07 },
-    { left: img03, right: img08 },
-    { left: img04, right: img09 },
-    { left: img05, right: img10 },
-  ];
+  const pairCount = HOME_POSTER_PAIRS.length;
 
   // Crea le associazioni: ogni immagine è associata a un todo
   // Le immagini sinistre (1-5) sono associate ai todo 1-5
   // Le immagini destre (6-10) sono associate ai todo 6-10
-  const getImageWithTodo = (img, index, side) => {
-    const todoIndex = side === 'left' ? index : index + 5;
+  const getImageWithTodo = (pair, index, side) => {
+    const todoIndex = side === 'left' ? index : index + LEFT_POSTER_IDS.length;
     const todo = todos[todoIndex] || null;
     return {
-      ...img,
+      ...pair,
       todoId: todo?.id || null,
       todo: todo
     };
   };
 
   // Duplica le immagini per creare il loop infinito
-  const duplicatedImages = [...images, ...images, ...images];
+  const duplicatedImages = [...HOME_POSTER_PAIRS, ...HOME_POSTER_PAIRS, ...HOME_POSTER_PAIRS];
 
   const handleImageClick = (todoId) => {
     if (!todoId) return;
@@ -207,177 +191,172 @@ export default function Home() {
   };
 
   return (
-    <div className="app-layout">
-      <div className="app-content-wrapper">
-        <Navbar />
-        <div className="home-split-container" ref={containerRef}>
-          <div className="home-left-section" ref={leftSectionRef}>
-            {duplicatedImages.map((img, index) => {
-              const imageWithTodo = getImageWithTodo(img, index % 5, 'left');
-              return (
-                <div 
-                  key={`left-${index}`} 
-                  className="home-image-wrapper"
-                  onMouseMove={(e) => {
-                    const title = e.currentTarget.querySelector('.home-image-title');
-                    if (title) {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const titleRect = title.getBoundingClientRect();
-                      const x = e.clientX - rect.left;
-                      const y = e.clientY - rect.top;
-                      const offsetX = 15;
-                      const offsetY = 15;
-                      
-                      // Calcola la posizione del titolo
-                      let titleX = x + offsetX;
-                      let titleY = y + offsetY;
-                      
-                      // Assicurati che il titolo rimanga dentro i margini per evitare cambi di wrapping
-                      const titleWidth = titleRect.width || 200; // max-width del titolo
-                      const titleHeight = titleRect.height || 50; // altezza stimata
-                      
-                      // Se il titolo esce dal margine destro, spostalo a sinistra
-                      if (titleX + titleWidth > rect.width) {
-                        titleX = rect.width - titleWidth - 10;
-                      }
-                      // Se il titolo esce dal margine sinistro, spostalo a destra
-                      if (titleX < 0) {
-                        titleX = 10;
-                      }
-                      // Se il titolo esce dal margine inferiore, spostalo in alto
-                      if (titleY + titleHeight > rect.height) {
-                        titleY = rect.height - titleHeight - 10;
-                      }
-                      // Se il titolo esce dal margine superiore, spostalo in basso
-                      if (titleY < 0) {
-                        titleY = 10;
-                      }
-                      
-                      // Calcola l'opacità in base alla distanza dai margini
-                      const margin = 50;
-                      const distanceFromLeft = x;
-                      const distanceFromRight = rect.width - x;
-                      const distanceFromTop = y;
-                      const distanceFromBottom = rect.height - y;
-                      
-                      const minDistance = Math.min(
-                        distanceFromLeft,
-                        distanceFromRight,
-                        distanceFromTop,
-                        distanceFromBottom
-                      );
-                      
-                      const opacity = minDistance < margin ? Math.max(0, minDistance / margin) : 1;
-                      
-                      title.style.left = `${titleX}px`;
-                      title.style.top = `${titleY}px`;
-                      title.style.opacity = opacity.toString();
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    const title = e.currentTarget.querySelector('.home-image-title');
-                    if (title) {
-                      title.style.opacity = '0';
-                    }
-                  }}
-                >
-                  <img 
-                    src={imageWithTodo.left}
-                    alt={imageWithTodo.todo?.title || `Left ${index + 1}`}
-                    className="home-image"
-                    onClick={() => handleImageClick(imageWithTodo.todoId)}
-                  />
-                  {imageWithTodo.todo?.title && (
-                    <div className="home-image-title">{imageWithTodo.todo.title}</div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          <div className="home-right-section" ref={rightSectionRef}>
-            {duplicatedImages.map((img, index) => {
-              const imageWithTodo = getImageWithTodo(img, index % 5, 'right');
-              return (
-                <div 
-                  key={`right-${index}`} 
-                  className="home-image-wrapper"
-                  onMouseMove={(e) => {
-                    const title = e.currentTarget.querySelector('.home-image-title');
-                    if (title) {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const titleRect = title.getBoundingClientRect();
-                      const x = e.clientX - rect.left;
-                      const y = e.clientY - rect.top;
-                      const offsetX = 15;
-                      const offsetY = 15;
-                      
-                      // Calcola la posizione del titolo
-                      let titleX = x + offsetX;
-                      let titleY = y + offsetY;
-                      
-                      // Assicurati che il titolo rimanga dentro i margini per evitare cambi di wrapping
-                      const titleWidth = titleRect.width || 200; // max-width del titolo
-                      const titleHeight = titleRect.height || 50; // altezza stimata
-                      
-                      // Se il titolo esce dal margine destro, spostalo a sinistra
-                      if (titleX + titleWidth > rect.width) {
-                        titleX = rect.width - titleWidth - 10;
-                      }
-                      // Se il titolo esce dal margine sinistro, spostalo a destra
-                      if (titleX < 0) {
-                        titleX = 10;
-                      }
-                      // Se il titolo esce dal margine inferiore, spostalo in alto
-                      if (titleY + titleHeight > rect.height) {
-                        titleY = rect.height - titleHeight - 10;
-                      }
-                      // Se il titolo esce dal margine superiore, spostalo in basso
-                      if (titleY < 0) {
-                        titleY = 10;
-                      }
-                      
-                      // Calcola l'opacità in base alla distanza dai margini
-                      const margin = 50;
-                      const distanceFromLeft = x;
-                      const distanceFromRight = rect.width - x;
-                      const distanceFromTop = y;
-                      const distanceFromBottom = rect.height - y;
-                      
-                      const minDistance = Math.min(
-                        distanceFromLeft,
-                        distanceFromRight,
-                        distanceFromTop,
-                        distanceFromBottom
-                      );
-                      
-                      const opacity = minDistance < margin ? Math.max(0, minDistance / margin) : 1;
-                      
-                      title.style.left = `${titleX}px`;
-                      title.style.top = `${titleY}px`;
-                      title.style.opacity = opacity.toString();
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    const title = e.currentTarget.querySelector('.home-image-title');
-                    if (title) {
-                      title.style.opacity = '0';
-                    }
-                  }}
-                >
-                  <img 
-                    src={imageWithTodo.right}
-                    alt={imageWithTodo.todo?.title || `Right ${index + 1}`}
-                    className="home-image"
-                    onClick={() => handleImageClick(imageWithTodo.todoId)}
-                  />
-                  {imageWithTodo.todo?.title && (
-                    <div className="home-image-title">{imageWithTodo.todo.title}</div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+    <div className="home-split-container" ref={containerRef}>
+      <div className="home-left-section" ref={leftSectionRef}>
+        {duplicatedImages.map((pair, index) => {
+          const imageWithTodo = getImageWithTodo(pair, index % pairCount, 'left');
+          return (
+            <div 
+              key={`left-${index}`} 
+              className="home-image-wrapper"
+              onMouseMove={(e) => {
+                const title = e.currentTarget.querySelector('.home-image-title');
+                if (title) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const titleRect = title.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const y = e.clientY - rect.top;
+                  const offsetX = 15;
+                  const offsetY = 15;
+                  
+                  // Calcola la posizione del titolo
+                  let titleX = x + offsetX;
+                  let titleY = y + offsetY;
+                  
+                  // Assicurati che il titolo rimanga dentro i margini per evitare cambi di wrapping
+                  const titleWidth = titleRect.width || 200; // max-width del titolo
+                  const titleHeight = titleRect.height || 50; // altezza stimata
+                  
+                  // Se il titolo esce dal margine destro, spostalo a sinistra
+                  if (titleX + titleWidth > rect.width) {
+                    titleX = rect.width - titleWidth - 10;
+                  }
+                  // Se il titolo esce dal margine sinistro, spostalo a destra
+                  if (titleX < 0) {
+                    titleX = 10;
+                  }
+                  // Se il titolo esce dal margine inferiore, spostalo in alto
+                  if (titleY + titleHeight > rect.height) {
+                    titleY = rect.height - titleHeight - 10;
+                  }
+                  // Se il titolo esce dal margine superiore, spostalo in basso
+                  if (titleY < 0) {
+                    titleY = 10;
+                  }
+                  
+                  // Calcola l'opacità in base alla distanza dai margini
+                  const margin = 50;
+                  const distanceFromLeft = x;
+                  const distanceFromRight = rect.width - x;
+                  const distanceFromTop = y;
+                  const distanceFromBottom = rect.height - y;
+                  
+                  const minDistance = Math.min(
+                    distanceFromLeft,
+                    distanceFromRight,
+                    distanceFromTop,
+                    distanceFromBottom
+                  );
+                  
+                  const opacity = minDistance < margin ? Math.max(0, minDistance / margin) : 1;
+                  
+                  title.style.left = `${titleX}px`;
+                  title.style.top = `${titleY}px`;
+                  title.style.opacity = opacity.toString();
+                }
+              }}
+              onMouseLeave={(e) => {
+                const title = e.currentTarget.querySelector('.home-image-title');
+                if (title) {
+                  title.style.opacity = '0';
+                }
+              }}
+            >
+              <img 
+                src={imageWithTodo.left}
+                alt={imageWithTodo.todo?.title || `Left ${index + 1}`}
+                className="home-image"
+                onClick={() => handleImageClick(imageWithTodo.todoId)}
+              />
+              {imageWithTodo.todo?.title && (
+                <div className="home-image-title">{imageWithTodo.todo.title}</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div className="home-right-section" ref={rightSectionRef}>
+        {duplicatedImages.map((pair, index) => {
+          const imageWithTodo = getImageWithTodo(pair, index % pairCount, 'right');
+          return (
+            <div 
+              key={`right-${index}`} 
+              className="home-image-wrapper"
+              onMouseMove={(e) => {
+                const title = e.currentTarget.querySelector('.home-image-title');
+                if (title) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const titleRect = title.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const y = e.clientY - rect.top;
+                  const offsetX = 15;
+                  const offsetY = 15;
+                  
+                  // Calcola la posizione del titolo
+                  let titleX = x + offsetX;
+                  let titleY = y + offsetY;
+                  
+                  // Assicurati che il titolo rimanga dentro i margini per evitare cambi di wrapping
+                  const titleWidth = titleRect.width || 200; // max-width del titolo
+                  const titleHeight = titleRect.height || 50; // altezza stimata
+                  
+                  // Se il titolo esce dal margine destro, spostalo a sinistra
+                  if (titleX + titleWidth > rect.width) {
+                    titleX = rect.width - titleWidth - 10;
+                  }
+                  // Se il titolo esce dal margine sinistro, spostalo a destra
+                  if (titleX < 0) {
+                    titleX = 10;
+                  }
+                  // Se il titolo esce dal margine inferiore, spostalo in alto
+                  if (titleY + titleHeight > rect.height) {
+                    titleY = rect.height - titleHeight - 10;
+                  }
+                  // Se il titolo esce dal margine superiore, spostalo in basso
+                  if (titleY < 0) {
+                    titleY = 10;
+                  }
+                  
+                  // Calcola l'opacità in base alla distanza dai margini
+                  const margin = 50;
+                  const distanceFromLeft = x;
+                  const distanceFromRight = rect.width - x;
+                  const distanceFromTop = y;
+                  const distanceFromBottom = rect.height - y;
+                  
+                  const minDistance = Math.min(
+                    distanceFromLeft,
+                    distanceFromRight,
+                    distanceFromTop,
+                    distanceFromBottom
+                  );
+                  
+                  const opacity = minDistance < margin ? Math.max(0, minDistance / margin) : 1;
+                  
+                  title.style.left = `${titleX}px`;
+                  title.style.top = `${titleY}px`;
+                  title.style.opacity = opacity.toString();
+                }
+              }}
+              onMouseLeave={(e) => {
+                const title = e.currentTarget.querySelector('.home-image-title');
+                if (title) {
+                  title.style.opacity = '0';
+                }
+              }}
+            >
+              <img 
+                src={imageWithTodo.right}
+                alt={imageWithTodo.todo?.title || `Right ${index + 1}`}
+                className="home-image"
+                onClick={() => handleImageClick(imageWithTodo.todoId)}
+              />
+              {imageWithTodo.todo?.title && (
+                <div className="home-image-title">{imageWithTodo.todo.title}</div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

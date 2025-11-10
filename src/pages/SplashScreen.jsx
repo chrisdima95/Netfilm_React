@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isAuthenticated } from '../utils/auth';
 import Logo from '../components/Logo';
 import './SplashScreen.css';
 

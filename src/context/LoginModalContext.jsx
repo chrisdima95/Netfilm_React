@@ -1,9 +1,8 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import LoginModal from '../components/LoginModal';
 import { isAuthenticated } from '../utils/auth';
-
-const LoginModalContext = createContext(null);
+import { LoginModalContext } from './LoginModalContextValue.js';
 
 export function LoginModalProvider({ children }) {
   const navigate = useNavigate();
@@ -73,14 +72,3 @@ export function LoginModalProvider({ children }) {
     </LoginModalContext.Provider>
   );
 }
-
-export function useLoginModal() {
-  const context = useContext(LoginModalContext);
-
-  if (!context) {
-    throw new Error('useLoginModal must be used within a LoginModalProvider');
-  }
-
-  return context;
-}
-

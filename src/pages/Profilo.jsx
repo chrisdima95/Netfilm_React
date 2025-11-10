@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUser, logout } from '../utils/auth';
 import { getFavorites, removeFavorite, subscribeToFavorites } from '../utils/favorites';
-import { useLoginModal } from '../context/LoginModalContext';
+import { useLoginModal } from '../context/useLoginModal';
 import './Profilo.css';
 
 const infoFields = [

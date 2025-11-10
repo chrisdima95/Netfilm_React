@@ -1,30 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getFavorites, removeFavorite, subscribeToFavorites } from '../utils/favorites';
+import { getPosterForTodo } from '../utils/posters';
 import './ListaTodos.css';
-import img01 from '../assets/57 secondi.jpg';
-import img02 from '../assets/argo.jpg';
-import img03 from '../assets/dracula.jpg';
-import img04 from '../assets/gladiatore.jpg';
-import img05 from '../assets/inception.jpg';
-import img06 from '../assets/king conqueror.jpg';
-import img07 from '../assets/Oppenheimer.jpg';
-import img08 from '../assets/prophecy.jpg';
-import img09 from '../assets/Titanic.jpg';
-import img10 from '../assets/un delitto ideale.jpg';
-
-const filmImages = {
-  1: img01,
-  2: img02,
-  3: img03,
-  4: img04,
-  5: img05,
-  6: img06,
-  7: img07,
-  8: img08,
-  9: img09,
-  10: img10
-};
 
 export default function Preferiti() {
   const navigate = useNavigate();
@@ -67,7 +45,7 @@ export default function Preferiti() {
                     onClick={() => navigate(`/home/film/${film.id}`)}
                   >
                     <img
-                      src={film.image || filmImages[film.id] || img01}
+                      src={film.image || getPosterForTodo(film)}
                       alt={film.title}
                       className="todo-card-image"
                     />

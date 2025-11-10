@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useLoginModal } from '../context/LoginModalContext';
+import { useLoginModal } from '../context/useLoginModal';
 
 export default function ProtectedRoute({ children }) {
   const location = useLocation();

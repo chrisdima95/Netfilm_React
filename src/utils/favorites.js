@@ -64,7 +64,7 @@ function loadFavoritesStore() {
 function dispatchFavoritesUpdate(favorites) {
   try {
     window.dispatchEvent(new CustomEvent(UPDATE_EVENT, { detail: favorites }));
-  } catch (err) {
+  } catch {
     // In ambienti senza window (ad es. test), ignora
   }
 }

@@ -2,71 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTodos, createTodo, patchTodo, deleteTodo } from '../api/jsonplaceholder';
 import { addFavorite, removeFavorite, getFavorites, isFavorite, subscribeToFavorites } from '../utils/favorites';
+import { getPosterForTodo } from '../utils/posters';
 import './ListaTodos.css';
-import img01 from '../assets/57 secondi.jpg';
-import img02 from '../assets/argo.jpg';
-import img03 from '../assets/dracula.jpg';
-import img04 from '../assets/gladiatore.jpg';
-import img05 from '../assets/inception.jpg';
-import img06 from '../assets/king conqueror.jpg';
-import img07 from '../assets/Oppenheimer.jpg';
-import img08 from '../assets/prophecy.jpg';
-import img09 from '../assets/Titanic.jpg';
-import img10 from '../assets/un delitto ideale.jpg';
-
-const filmImagesById = {
-  1: img01,
-  2: img02,
-  3: img03,
-  4: img04,
-  5: img05,
-  6: img06,
-  7: img07,
-  8: img08,
-  9: img09,
-  10: img10
-};
-
-const filmImagesByTitle = {
-  'delectus aut autem': img01,
-  'quis ut nam facilis et officia qui': img02,
-  'fugiat veniam minus': img03,
-  'et porro tempora': img04,
-  'laboriosam mollitia et enim quasi adipisci quia provident illum': img05,
-  'qui ullam ratione quibusdam voluptatem quia omnis': img06,
-  'illo expedita consequatur quia in': img07,
-  'quo adipisci enim quam ut ab': img08,
-  'molestiae perspiciatis ipsa': img09,
-  'illo est ratione doloremque quia maiores aut': img10
-};
-
-// Funzione per ottenere l'immagine corrispondente a un todo
-function getTodoImage(todoId, todos, title) {
-  const normalizedTitle = title?.trim().toLowerCase();
-  if (normalizedTitle && filmImagesByTitle[normalizedTitle]) {
-    return filmImagesByTitle[normalizedTitle];
-  }
-
-  if (!todos || todos.length === 0) {
-    // Fallback: usa l'ID direttamente
-    if (todoId <= 5) {
-      return filmImagesById[todoId] || filmImagesById[1];
-    } else {
-      return filmImagesById[todoId - 5 + 6] || filmImagesById[1];
-    }
-  }
-  
-  const todoIndex = todos.findIndex(t => t.id === todoId);
-  if (todoIndex === -1) {
-    return filmImagesById[1]; // Default
-  }
-  
-  if (todoIndex < 5) {
-    return filmImagesById[todoIndex + 1];
-  } else {
-    return filmImagesById[todoIndex - 5 + 6];
-  }
-}
 
 export default function ListaTodos() {
   const navigate = useNavigate();
@@ -103,7 +40,8 @@ export default function ListaTodos() {
     };
   }, []);
 
-  function toggleFavorite(todo, image) {
+  function toggleFavorite(todo) {
+    const poster = getPosterForTodo(todo, todos);
     if (isFavorite(todo.id)) {
       removeFavorite(todo.id);
     } else {
@@ -111,7 +49,7 @@ export default function ListaTodos() {
         id: todo.id,
         title: todo.title,
         completed: todo.completed,
-        image
+        image: poster
       });
     }
 
@@ -364,7 +302,7 @@ export default function ListaTodos() {
               </div>
             ) : (
               filteredTodos.map(todo => {
-                const todoImage = getTodoImage(todo.id, todos, todo.title);
+                const poster = getPosterForTodo(todo, todos);
                 const favorite = favorites.some((fav) => fav.id === todo.id);
                 return (
                   <div key={todo.id} className="todo-card">
@@ -419,7 +357,7 @@ export default function ListaTodos() {
                           onClick={() => navigate(`/home/film/${todo.id}`)}
                         >
                           <img 
-                            src={todoImage} 
+                            src={poster} 
                             alt={todo.title} 
                             className="todo-card-image"
                           />
@@ -435,7 +373,7 @@ export default function ListaTodos() {
                             <div className="todo-card-actions">
                               <button
                                 type="button"
-                                onClick={() => toggleFavorite(todo, todoImage)}
+                                onClick={() => toggleFavorite(todo)}
                                 className={`todo-favorite-button ${favorite ? 'active' : ''}`}
                                 aria-label={favorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
                                 title={favorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}

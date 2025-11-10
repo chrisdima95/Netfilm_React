@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logout } from '../utils/auth';
-import { useLoginModal } from '../context/LoginModalContext';
+import { useLoginModal } from '../context/useLoginModal';
 import logoutImg from '../assets/logout.png';
 import './Sidebar.css';
 
@@ -48,7 +48,6 @@ export default function Sidebar({ isOpen, onToggle }) {
               className={`sidebar-item ${isActive(item.path) ? 'active' : ''}`}
               onClick={() => handleNavigate(item.path)}
             >
-              <span className="sidebar-icon">{item.icon}</span>
               <span className="sidebar-label">{item.label}</span>
             </button>
           ))}
